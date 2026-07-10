@@ -1,20 +1,36 @@
-function love.joystickadded() end
+function love.joystickadded()
+
+end
 -- Called when a Joystick is connected.
 
-function love.joystickremoved() end
+function love.joystickremoved()
+
+end
 -- Called when a Joystick is disconnected.
 
-function love.joystickaxis() end
+function love.joystickaxis()
+
+end
 -- Called when a joystick axis moves.
 
-function love.joystickhat() end
+function love.joystickhat()
+
+end
 -- Called when a joystick hat direction changes.
 
-function love.joystickpressed() end
+function love.joystickpressed()
+
+end
 -- Called when a joystick button is pressed.
 
-function love.joystickreleased() end
+function love.joystickreleased()
+
+end
 -- Called when a joystick button is released.
 
-function love.joysticksensorupdated() end
+-------------- in love 12: ----------------
+
+function love.joysticksensorupdated()
+
+end
 -- Called when a Joystick's sensor is updated with new values.

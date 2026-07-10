@@ -1,7 +1,11 @@
-function love.lowmemory() end
+function love.lowmemory()
+
+end
 -- Callback function triggered when the system is running out of memory on mobile devices.
 
-function love.threaderror() end
+function love.threaderror()
+
+end
 -- Callback function triggered when a Thread encounters an error.
 
 -- function love.errorhandler() end
@@ -9,3 +13,10 @@ function love.threaderror() end
 
 -- function love.run() end
 -- The main callback function, containing the main loop. A sensible default is used when left out.
+
+-------------- in love 12: ----------------
+
+function love.localechanged()
+
+end
+-- Callback function triggered when the user's system locale preferences have changed.
