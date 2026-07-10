@@ -1,8 +1,10 @@
+---@diagnostic disable-next-line: duplicate-set-field
 function love.lowmemory()
 
 end
 -- Callback function triggered when the system is running out of memory on mobile devices.
 
+---@diagnostic disable-next-line: duplicate-set-field
 function love.threaderror()
 
 end
@@ -16,6 +18,7 @@ end
 
 -------------- in love 12: ----------------
 
+---@diagnostic disable-next-line: duplicate-set-field
 function love.localechanged()
 
 end
