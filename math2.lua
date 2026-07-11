@@ -585,4 +585,19 @@ function math2.walkpolyline(points, x, y, i, speed, stop)
         i, backward and -speed or speed, stop)
 end
 
+---https://en.wikipedia.org/wiki/Hypotrochoid
+function math2.hypertrochoid(a, r1, r2, d)
+    local dr = r2-r1
+    local drDr = dr/r1
+    local cosa = cos(a)
+    local sina = sin(a)
+
+    local aXdrDr = a*drDr
+    local cosaXdrDr = cos(aXdrDr)
+    local sinaXdrDr = sin(aXdrDr)
+    local x = dr*cosa + d*cosaXdrDr
+    local y = dr*sina - d*sinaXdrDr
+    return x, y
+end
+
 return math2
