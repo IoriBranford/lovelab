@@ -563,19 +563,14 @@ function math2.walkpolyline(points, x, y, i, speed, stop)
     i = max(2, min(i or 2, n))
 
     speed = speed or 1
-    if speed == 0 then return x, y, i end
-
     local backward = speed < 0
     speed = abs(speed)
 
     local px, py = points[i-1], points[i]
-    local d, dx, dy = 0, 0, 0
-    if x ~= px or y ~= py then
-        d, dx, dy = math2.dist(x, y, px, py)
-        if d > speed then
-            speed = speed / d
-            return x + dx * speed, y + dy * speed, i
-        end
+    local d, dx, dy = math2.dist(x, y, px, py)
+    if d > speed then
+        speed = speed / d
+        return x + dx * speed, y + dy * speed, i
     end
 
     stop = stop or (backward and 2 or n)
