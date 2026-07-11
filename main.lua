@@ -1,14 +1,50 @@
+require "math1"
+require "table.new"
 local fixed_timestep = require "fixed_timestep"
 local math2          = require "math2"
+
 ---@diagnostic disable-next-line: duplicate-set-field
 function love.load()
-    Points = {
-        320,224,320,128,0,128,32,96,64,96,96,64,160,64,192,32,224,32,288,32,288,112,256,144,256,224
-    }
+    love.window.setVSync(-1)
+    Points = table.new(2*10*360, 0)
+    local r1, r2, d = 60, 100, 100
+    local dr = r2-r1
+    local drDr = dr/r1
+    local sr = r1+r2
+    local srDr = sr/r1
+    for i = 1, 360*3 do
+        local a = math.rad(i)
+        local cosa = math.cos(a)
+        local sina = math.sin(a)
+
+        local aXdrDr = a*drDr
+        local cosaXdrDr = math.cos(aXdrDr)
+        local sinaXdrDr = math.sin(aXdrDr)
+        local x = dr*cosa + d*cosaXdrDr
+        local y = dr*sina - d*sinaXdrDr
+        Points[#Points+1] = x
+        Points[#Points+1] = y
+    end
+    -- for i = 1, 360*5 do
+    --     local a = math.rad(i)
+    --     local cosa = math.cos(a)
+    --     local sina = math.sin(a)
+
+    --     local aXsrDr = a*srDr
+    --     local cosaXsrDr = math.cos(aXsrDr)
+    --     local sinaXsrDr = math.sin(aXsrDr)
+    --     local x = sr*cosa - d*cosaXsrDr
+    --     local y = sr*sina - d*sinaXsrDr
+    --     Points[#Points+1] = x
+    --     Points[#Points+1] = y
+    -- end
     I = 2
-    X = 0
-    Y = 0
-    Speed = 4
+    X = Points[1]
+    Y = Points[2]
+    NextX = X
+    NextY = Y
+    Speed = 10
+    DrawLerp = 0
     FixedTimestep = fixed_timestep(60)
     require("lldebugger").start()
 end
@@ -16,20 +52,29 @@ end
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function love.update(dt)
-    FixedTimestep(dt, function()
-        X, Y, I = math2.walkpolyline(Points, X, Y, I, 4)
+    DrawLerp = FixedTimestep(dt, function()
+        X, Y = NextX, NextY
+        NextX, NextY, I = math2.walkpolyline(Points, X, Y, I, Speed)
+        if I <= 2 or I >= #Points then
+            Speed = -Speed
+        end
     end)
 end
 -- Callback function used to update the state of the game every frame.
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function love.draw()
+    love.graphics.translate(love.graphics.getWidth()/2, love.graphics.getHeight()/2)
     love.graphics.setColor(1,1,1)
     love.graphics.line(Points)
-    local t = love.timer.getTime()*1000
-    local dx, dy = math2.frompolar(t, 16)
+
+    local x = math.lerp(DrawLerp, X, NextX)
+    local y = math.lerp(DrawLerp, Y, NextY)
+    local t = love.timer.getTime()*256
+    local lx, ly = math2.frompolar(t, 16)
     love.graphics.setColor(love.math.random(),love.math.random(),love.math.random())
-    love.graphics.line(X-dx, Y-dy, X+dx, Y+dy)
+    -- love.graphics.line(x-lx, y-ly, x+lx, y+ly)
+    love.graphics.circle("fill", x, y, 10)
 end
 -- Callback function used to draw on the screen every frame.
 
