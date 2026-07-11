@@ -552,25 +552,24 @@ end
 ---@param points number[]
 ---@param x number walker x
 ---@param y number walker y
----@param i integer? 2, 4, 6... to go forward, -1, -3, -5... to go backward
----@param speed number? default 1
----@param stop integer? don't walk past this i - make sure this corresponds with the direction of i
+---@param i integer?
+---@param speed number? default 1, sign indicates forward or backward
+---@param stop integer?
 ---@return number x
 ---@return number y
 ---@return integer i
 function math2.walkpolyline(points, x, y, i, speed, stop)
     local n = #points
-    i = max(-n+1, min(i or 2, n))
-    if i == 0 then
-        i = 2
-    elseif i < 0 and i % 2 == 0
-    or i > 0 and i % 2 ~= 0 then
-        i = i + 1
-    end
+    i = max(2, min(i or 2, n))
+
     speed = speed or 1
+    if speed == 0 then return x, y, i end
+
+    local backward = speed < 0
+    speed = abs(speed)
 
     local px, py = points[i-1], points[i]
-    local d, dx, dy
+    local d, dx, dy = 0, 0, 0
     if x ~= px or y ~= py then
         d, dx, dy = math2.dist(x, y, px, py)
         if d > speed then
@@ -579,15 +578,16 @@ function math2.walkpolyline(points, x, y, i, speed, stop)
         end
     end
 
-    stop = stop or i < 0 and (-n+1) or n
-
+    stop = stop or (backward and 2 or n)
+    stop = max(2, min(stop, n))
     if stop == i then
         return px, py, i
     end
 
-    local i2 = i < 0 and i - 2 or i + 2
+    i = i + (backward and -2 or 2)
+    speed = speed - d
     return math2.walkpolyline(points, px, py,
-        i2, speed - d, stop)
+        i, backward and -speed or speed, stop)
 end
 
 return math2
