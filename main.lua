@@ -44,15 +44,15 @@ function love.load()
     NextX = X
     NextY = Y
     Speed = 10
-    DrawLerp = 0
-    FixedTimestep = fixed_timestep(60)
+    FrameLerp = 0
+    FixedTimestep = fixed_timestep(10)
     require("lldebugger").start()
 end
 -- This function is called exactly once at the beginning of the game.
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function love.update(dt)
-    DrawLerp = FixedTimestep(dt, function()
+    FrameLerp = FixedTimestep(dt, function()
         X, Y = NextX, NextY
         NextX, NextY, I = math2.walkpolyline(Points, X, Y, I, Speed)
         if I <= 2 or I >= #Points then
@@ -68,11 +68,10 @@ function love.draw()
     love.graphics.setColor(1,1,1)
     love.graphics.line(Points)
 
-    local x = math.lerp(DrawLerp, X, NextX)
-    local y = math.lerp(DrawLerp, Y, NextY)
+    local x, y = math2.walkpolyline(Points, X, Y, I, Speed*FrameLerp)
     local t = love.timer.getTime()*256
-    local lx, ly = math2.frompolar(t, 16)
     love.graphics.setColor(love.math.random(),love.math.random(),love.math.random())
+    -- local lx, ly = math2.frompolar(t, 16)
     -- love.graphics.line(x-lx, y-ly, x+lx, y+ly)
     love.graphics.circle("fill", x, y, 10)
 end
