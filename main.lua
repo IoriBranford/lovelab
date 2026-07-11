@@ -41,9 +41,7 @@ function love.load()
     I = 2
     X = Points[1]
     Y = Points[2]
-    NextX = X
-    NextY = Y
-    Speed = 10
+    Speed = 20
     FrameLerp = 0
     FixedTimestep = fixed_timestep(10)
     require("lldebugger").start()
@@ -53,8 +51,7 @@ end
 ---@diagnostic disable-next-line: duplicate-set-field
 function love.update(dt)
     FrameLerp = FixedTimestep(dt, function()
-        X, Y = NextX, NextY
-        NextX, NextY, I = math2.walkpolyline(Points, X, Y, I, Speed)
+        X, Y, I = math2.walkpolyline(Points, X, Y, I, Speed)
         if I <= 2 or I >= #Points then
             Speed = -Speed
         end
