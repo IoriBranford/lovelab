@@ -1,0 +1,3 @@
+[submodule "math123"]
+	path = math123
+	url = https://github.com/IoriBranford/math123.git

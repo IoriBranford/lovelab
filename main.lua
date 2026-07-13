@@ -1,7 +1,6 @@
-require "math1"
+require "math123".goGlobal()
 require "table.new"
 local fixed_timestep = require "fixed_timestep"
-local math2          = require "math2"
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function love.load()
