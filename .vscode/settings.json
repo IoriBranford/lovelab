@@ -1,11 +1,21 @@
 {
     "Lua.addonManager.enable": true,
     "Lua.workspace.library": [
-        "${addons}/love2d/module/library"
+        "${addons}/love2d/module/library",
+        "${addons}/lldebugger/module/library"
     ],
     "Lua.runtime.version": "LuaJIT",
     "Lua.runtime.special": {
         "love.filesystem.load": "loadfile"
     },
+    "Lua.workspace.ignoreDir": [
+        ".vscode",
+    ],
+    "Lua.runtime.path": [
+        "?.lua",
+        "?/init.lua",
+        "libraries/?.lua",
+        "libraries/?/init.lua",
+    ],
     "Lua.workspace.checkThirdParty": false
 }
