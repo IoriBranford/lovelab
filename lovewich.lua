@@ -2,7 +2,7 @@ local type = type
 local cocreate = coroutine.create
 local coresume = coroutine.resume
 local costatus = coroutine.status
-local FS = love.filesystem
+local loadfile = love and love.filesystem.load or loadfile
 
 ---@class lovewich.ftable
 ---@field [string] function
@@ -27,7 +27,7 @@ function lovewich:pushf(file, ...)
 end
 
 function lovewich:loadf(file, ...)
-    local _, f = pcall(FS.load, file)
+    local _, f = pcall(loadfile, file)
     if type(f) ~= "function" then return nil, f end
     self.files[file] = f
     return self:push(f(...))
