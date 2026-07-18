@@ -29,6 +29,16 @@ cli = cli..[[
     <files...> (string)   One or more LOVE programs to run
 ]]
 
+local function drawLoadError(i, err)
+    local mrg = 10
+    local w = GX.getWidth()
+    local font = GX.getFont()
+    local fh = font:getHeight()
+    local x, y = mrg, fh*i
+    w = w - 2*mrg
+    GX.printf(err, x, y, w, "left")
+end
+
 ---@diagnostic disable-next-line: duplicate-set-field
 function love.run()
     local args = require "pl.lapp"(cli)
@@ -56,15 +66,7 @@ function love.run()
         err = string.format("%d. %s: %s", i, file, err)
         print(err)
         LW[#LW+1] = {
-            draw = function()
-                local mrg = 10
-                local w = GX.getWidth()
-                local font = GX.getFont()
-                local fh = font:getHeight()
-                local x, y = mrg, fh*i
-                w = w - 2*mrg
-                GX.printf(err, x, y, w, "left")
-            end
+            draw = function() drawLoadError(i, err) end
         }
     end
 
@@ -76,13 +78,7 @@ function love.run()
     if #LW <= 0 then
         LW[1] = {
             draw = function()
-                local mrg = 10
-                local w = GX.getWidth()
-                local font = GX.getFont()
-                local fh = font:getHeight()
-                local x, y = mrg, fh
-                w = w - 2*mrg
-                GX.printf("No code files", x, y, w, "left")
+                drawLoadError(1, "No code files")
             end
         }
     end
