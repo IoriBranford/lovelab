@@ -10,6 +10,8 @@
     },
     "Lua.workspace.ignoreDir": [
         ".vscode",
+        "dragontail",
+        "data"
     ],
     "Lua.runtime.path": [
         "?.lua",

@@ -1,0 +1,5 @@
+[dragontail "dragontail"]
+	shallow = true
+[submodule "dragontail"]
+	path = dragontail
+	url = https://github.com/IoriBranford/dragontail.git
