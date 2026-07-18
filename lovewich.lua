@@ -1,4 +1,6 @@
 local type = type
+local pcall = pcall
+local require = require
 local cocreate = coroutine.create
 local coresume = coroutine.resume
 local costatus = coroutine.status
