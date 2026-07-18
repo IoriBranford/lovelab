@@ -67,10 +67,25 @@ function love.run()
             end
         }
     end
-    for i, file in ipairs(files) do
-        loadf(i, file)
+
+    local i1 = FS.isFused() and 1 or 2
+    for i = i1, #files do
+        loadf(i, files[i])
     end
 
+    if #LW <= 0 then
+        LW[1] = {
+            draw = function()
+                local mrg = 10
+                local w = GX.getWidth()
+                local font = GX.getFont()
+                local fh = font:getHeight()
+                local x, y = mrg, fh
+                w = w - 2*mrg
+                GX.printf("No code files", x, y, w, "left")
+            end
+        }
+    end
 
 	-- We don't want the first frame's dt to include
     -- time taken by love.load.
