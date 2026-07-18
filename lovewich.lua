@@ -33,8 +33,8 @@ function lovewich:pushfile(file, ...)
 end
 
 function lovewich:loadfile(file, ...)
-    local _, f = pcall(loadfile, file)
-    if type(f) ~= "function" then return nil, f end
+    local f, err = loadfile(file)
+    if not f then return nil, err end
     self.files[file] = f
     local ft = f(...)
     if type(ft) ~= "table" then
@@ -46,7 +46,10 @@ end
 
 function lovewich:pushmodule(module, ...)
     local ok, m = pcall(require, module)
-    if not ok then return nil, m end
+    if not ok then return ok, m end
+    if type(m) ~= "function" then
+        return nil, module.." must return a function table generator"
+    end
     local ft = m(...)
     if type(ft) ~= "table" then
         return nil, module.." must return a function table"
