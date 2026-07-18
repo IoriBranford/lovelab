@@ -293,7 +293,15 @@ Assets.addLoaders {
         local size = tonumber(path:match("(%d+).defaultfont"))
         return size and love.graphics.newFont(size)
     end,
-    jase = hasAseprite and Aseprite.load
+    jase = hasAseprite and Aseprite.load,
+
+    mp3 = love.audio.newSource,
+    ogg = love.audio.newSource,
+    wav = love.audio.newSource,
+    it  = love.audio.newSource,
+    xm  = love.audio.newSource,
+    s3m = love.audio.newSource,
+    mod = love.audio.newSource,
 }
 
 if hasAseprite then
