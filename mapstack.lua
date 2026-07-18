@@ -62,13 +62,30 @@ function MapStack.pop()
     return top
 end
 
-function MapStack.event(e, ...)
-    for _, map in ipairs(maps) do
-        local f = map[e]
-        if type(f) == "function" then
-            f(map, ...)
+local function event(i1, i2, di, ev, a, b, c, d, e, f)
+    for i = i1, i2, di do
+        local map = maps[i]
+        local fn = map[ev]
+        if type(fn) == "function" then
+            local u, v, w, x, y, z
+                = fn(map, a, b, c, d, e, f)
+            if u ~= nil then a = u end
+            if v ~= nil then b = v end
+            if w ~= nil then c = w end
+            if x ~= nil then d = x end
+            if y ~= nil then e = y end
+            if z ~= nil then f = z end
         end
     end
+    return a, b, c, d, e, f
+end
+
+function MapStack.inevent(e, ...)
+    event(1, #maps, 1, e, ...)
+end
+
+function MapStack.outevent(e, ...)
+    event(#maps, 1, -1, e, ...)
 end
 
 function MapStack.empty()

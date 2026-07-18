@@ -70,14 +70,14 @@ function love.run()
 						return a or 0
 					end
 				end
-				mapstack.event(name,a,b,c,d,e,f)
+				mapstack.inevent(name,a,b,c,d,e,f)
 			end
 		end
 
 		if love.timer then dt = love.timer.step() end
 
-        local t = fixedtimestep(dt, mapstack.event, "fixedupdate")
-        mapstack.event("animate", dt)
+        local t = fixedtimestep(dt, mapstack.outevent, "fixedupdate")
+        mapstack.outevent("animate", dt)
 
 		if love.graphics and love.graphics.isActive() then
 			love.graphics.origin()
@@ -87,7 +87,7 @@ function love.run()
                 local gw, gh = GX.getDimensions()
                 GX.printf("No maps", 0, 0, gw, "center")
             else
-                mapstack.event("draw", t)
+                mapstack.outevent("draw", t)
             end
 
 			love.graphics.present()
