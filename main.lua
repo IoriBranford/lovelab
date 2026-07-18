@@ -26,7 +26,7 @@ cli = cli..[[
     -d,--debug                 Debug with tomblind.local-lua-debugger-vscode
     --profile               Profile code performance
     --os (optional string)  Fake a certain OS for testing
-    <files...> (string)   One or more LOVE programs to run
+    <files...> (optional string)   One or more LOVE programs to run
 ]]
 
 local function drawLoadError(i, err)
