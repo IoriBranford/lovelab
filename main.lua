@@ -9,7 +9,7 @@ FS.setRequirePath(table.concat({
     "libraries/?/init.lua",
 }, ';'))
 
-local mapstack = require "mapstack"
+local lovewich = require "lovewich"
 
 local fixed_timestep = require "fixed_timestep"
 
@@ -26,7 +26,7 @@ cli = cli..[[
     -d,--debug                 Debug with tomblind.local-lua-debugger-vscode
     --profile               Profile code performance
     --os (optional string)  Fake a certain OS for testing
-    <maps...> (string)   One or more maps to run
+    <files...> (string)   One or more LOVE programs to run
 ]]
 
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -35,7 +35,6 @@ function love.run()
 
 	if args.debug then
 		require("lldebugger").start()
-		-- lldebugger.off()
 	end
 
     if args.profile then
@@ -45,14 +44,33 @@ function love.run()
         profile.start("Fli1", filename)
     end
 
-    for _, a in ipairs(args.maps) do
-        local map, err = mapstack.load(a)
-        if map then
-            mapstack.push(map)
-        else
-            print(err)
-        end
+    local LW = lovewich.new()
+
+    GX.setNewFont(16)
+
+    local files = args.files
+    local function loadf(i, file)
+        local ft, err = LW:pushfile(file)
+        if ft then return end
+
+        err = string.format("%d. %s: %s", i, file, err)
+        print(err)
+        LW[#LW+1] = {
+            draw = function()
+                local mrg = 10
+                local w = GX.getWidth()
+                local font = GX.getFont()
+                local fh = font:getHeight()
+                local x, y = mrg, fh*i
+                w = w - 2*mrg
+                GX.printf(err, x, y, w, "left")
+            end
+        }
     end
+    for i, file in ipairs(files) do
+        loadf(i, file)
+    end
+
 
 	-- We don't want the first frame's dt to include
     -- time taken by love.load.
@@ -70,25 +88,20 @@ function love.run()
 						return a or 0
 					end
 				end
-				mapstack.inevent(name,a,b,c,d,e,f)
+				LW:inevent(name,a,b,c,d,e,f)
 			end
 		end
 
 		if love.timer then dt = love.timer.step() end
 
-        local t = fixedtimestep(dt, mapstack.outevent, "fixedupdate")
-        mapstack.outevent("animate", dt)
+        local t = fixedtimestep(dt, LW.outevent, LW, "fixedupdate")
+        LW:outevent("animate", dt)
 
 		if love.graphics and love.graphics.isActive() then
 			love.graphics.origin()
 			love.graphics.clear(love.graphics.getBackgroundColor())
 
-            if mapstack.empty() then
-                local gw, gh = GX.getDimensions()
-                GX.printf("No maps", 0, 0, gw, "center")
-            else
-                mapstack.outevent("draw", t)
-            end
+            LW:outevent("draw", t)
 
 			love.graphics.present()
 		end
