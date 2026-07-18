@@ -6,7 +6,7 @@ local loadfile = love and love.filesystem.load or loadfile
 
 ---@class lovewich.ftable
 ---@field [string] function
----@field co thread?
+---@field eventco thread?
 ---@field eventerror string?
 
 ---@class lovewich
@@ -20,7 +20,7 @@ function lovewich.new()
     return setmetatable({files = {}}, lovewich)
 end
 
-function lovewich:pushf(file, ...)
+function lovewich:pushfile(file, ...)
     local f = self.files[file]
     if f then
         local ft = f(...)
@@ -30,7 +30,7 @@ function lovewich:pushf(file, ...)
     return self:loadfile(file, ...)
 end
 
-function lovewich:loadf(file, ...)
+function lovewich:loadfile(file, ...)
     local _, f = pcall(loadfile, file)
     if type(f) ~= "function" then return nil, f end
     self.files[file] = f
@@ -42,7 +42,7 @@ function lovewich:loadf(file, ...)
     return ft
 end
 
-function lovewich:pushm(module, ...)
+function lovewich:pushmodule(module, ...)
     local ok, m = pcall(require, module)
     if not ok then return nil, m end
     local ft = m(...)
@@ -87,7 +87,11 @@ end
 
 local suspended = {} ---@type lovewich.ftable[]
 
-local function coevent1(ft, ev, co, a, b, c, d, e, f)
+---@param ft lovewich.ftable
+---@param ev string
+---@param co thread
+local function coeventi(ft, ev, co,
+                            a, b, c, d, e, f)
     local ok, u, v, w, x, y, z
         = coresume(co, a, b, c, d, e, f)
     if not ok then
@@ -95,7 +99,7 @@ local function coevent1(ft, ev, co, a, b, c, d, e, f)
         return a, b, c, d, e, f
     end
     if costatus(co) ~= "dead" then
-        ft.co = co
+        ft.eventco = co
         suspended[#suspended+1] = ft
     end
     if u ~= nil then a = u end
@@ -107,19 +111,23 @@ local function coevent1(ft, ev, co, a, b, c, d, e, f)
     return a, b, c, d, e, f
 end
 
-local function coevent(self, i1, i2, di, ev, a, b, c, d, e, f)
+---@param self lovewich
+local function coevent(self, i1, i2, di,
+                        ev, a, b, c, d, e, f)
     for i = i1, i2, di do
         local ft = self[i]
         local fn = ft[ev]
         if type(fn) == "function" then
             local co = cocreate(fn)
-            a, b, c, d, e, f = coevent1(ft, ev, co, a, b, c, d, e, f)
+            a, b, c, d, e, f =
+                coeventi(ft, ev, co,
+                    a, b, c, d, e, f)
         end
     end
     for i = #suspended, 1, -1 do
         local ft = suspended[i]
-        local co = assert(ft.co)
-        ft.co = nil
+        local co = assert(ft.eventco)
+        ft.eventco = nil
         local ok, err = coresume(co)
         if not ok then
             ft[ev.."error"] = err
