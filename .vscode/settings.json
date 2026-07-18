@@ -17,5 +17,12 @@
         "libraries/?.lua",
         "libraries/?/init.lua",
     ],
-    "Lua.workspace.checkThirdParty": false
+    "Lua.workspace.checkThirdParty": false,
+    "Lua.diagnostics.globals": [
+        "love",
+        "class",
+        "math1",
+        "math2",
+        "math3"
+    ]
 }
