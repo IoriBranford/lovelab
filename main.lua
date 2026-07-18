@@ -13,24 +13,46 @@ local mapstack = require "mapstack"
 
 local fixed_timestep = require "fixed_timestep"
 
+local cli = FS.getIdentity()
+if not love.filesystem.isFused() then
+    cli = cli .. [[
+        <game> (string)         Game assets location
+    ]]
+end
+cli = cli..[[
+    --console               Output to a console window
+    --version               Print LOVE version
+    --fused                 Force running in fused mode
+    -d,--debug                 Debug with tomblind.local-lua-debugger-vscode
+    --profile               Profile code performance
+    --os (optional string)  Fake a certain OS for testing
+    <maps...> (string)   One or more maps to run
+]]
+
 ---@diagnostic disable-next-line: duplicate-set-field
 function love.run()
-	local args = love.arg.parseGameArguments(arg)
+    local args = require "pl.lapp"(cli)
 
-    local debugger
-    for _, a in ipairs(args) do
-        if a == "--debug" then
-            debugger = require("lldebugger")
+	if args.debug then
+		require("lldebugger").start()
+		-- lldebugger.off()
+	end
+
+    if args.profile then
+        jit.off()
+        local profile = require("jit.p")
+        local filename = love.filesystem.getSaveDirectory() .. "/" .. os.date("profile_%Y-%m-%d_%H-%M-%S") .. ".txt"
+        profile.start("Fli1", filename)
+    end
+
+    for _, a in ipairs(args.maps) do
+        local map, err = mapstack.load(a)
+        if map then
+            mapstack.push(map)
         else
-            local map, err = mapstack.load(a)
-            if map then
-                mapstack.push(map)
-            else
-                print(err)
-            end
+            print(err)
         end
     end
-    if debugger then debugger.start() end
 
 	-- We don't want the first frame's dt to include
     -- time taken by love.load.
