@@ -22,21 +22,35 @@ end
 
 function lovewich:pushf(file, ...)
     local f = self.files[file]
-    if f then return self:push(f(...)) end
-    return self:loadf(file, ...)
+    if f then
+        local ft = f(...)
+        self[#self+1] = ft
+        return ft
+    end
+    return self:loadfile(file, ...)
 end
 
 function lovewich:loadf(file, ...)
     local _, f = pcall(loadfile, file)
     if type(f) ~= "function" then return nil, f end
     self.files[file] = f
-    return self:push(f(...))
+    local ft = f(...)
+    if type(ft) ~= "table" then
+        return nil, file.." must return a function table"
+    end
+    self[#self+1] = ft
+    return ft
 end
 
 function lovewich:pushm(module, ...)
     local ok, m = pcall(require, module)
     if not ok then return nil, m end
-    return self:push(m(...))
+    local ft = m(...)
+    if type(ft) ~= "table" then
+        return nil, module.." must return a function table"
+    end
+    self[#self+1] = ft
+    return ft
 end
 
 ---@param ft lovewich.ftable
