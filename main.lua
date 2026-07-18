@@ -3,8 +3,8 @@ local GX = love.graphics
 
 FS.setRequirePath(table.concat({
     FS.getRequirePath(),
-    -- "source/?.lua",
-    -- "source/?/init.lua",
+    "source/?.lua",
+    "source/?/init.lua",
     "libraries/?.lua",
     "libraries/?/init.lua",
 }, ';'))
