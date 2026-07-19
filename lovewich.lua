@@ -1,6 +1,7 @@
 local type = type
 local pcall = pcall
 local require = require
+local getmetatable = getmetatable
 local cocreate = coroutine.create
 local coresume = coroutine.resume
 local costatus = coroutine.status
@@ -29,10 +30,23 @@ function lovewich:pushfile(file, ...)
         self[#self+1] = ft
         return ft
     end
-    return self:loadfile(file, ...)
+    return self:loadandpushfile(file, ...)
 end
 
-function lovewich:loadfile(file, ...)
+local function isCallable(o)
+    local ot = type(o)
+
+    if ot == "function" then return true end
+    if ot == "table" then
+        local mt = getmetatable(o)
+        if mt and type(mt.__call) == "function" then
+            return true
+        end
+    end
+    return false
+end
+
+function lovewich:loadandpushfile(file, ...)
     local f, err = loadfile(file)
     if not f then return nil, err end
     self.files[file] = f
@@ -47,7 +61,7 @@ end
 function lovewich:pushmodule(module, ...)
     local ok, m = pcall(require, module)
     if not ok then return ok, m end
-    if type(m) ~= "function" then
+    if not isCallable(m) then
         return nil, module.." must return a function table generator"
     end
     local ft = m(...)
