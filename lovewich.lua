@@ -160,6 +160,10 @@ function lovewich:cooutevent(e, ...)
     coevent(self, 1, #self, 1, e, ...)
 end
 
+function lovewich:coinevent(e, ...)
+    coevent(self, #self, 1, -1, e, ...)
+end
+
 function lovewich:outevent(e, ...)
     event(self, 1, #self, 1, e, ...)
 end
