@@ -1,5 +1,4 @@
 local FS = love.filesystem
-local GX = love.graphics
 
 FS.setRequirePath(table.concat({
     FS.getRequirePath(),
@@ -10,37 +9,28 @@ FS.setRequirePath(table.concat({
 }, ';'))
 
 local lovewich = require "lovewich"
+local fixedupdate = require "fixedupdate"
 
-local fixed_timestep = require "fixed_timestep"
-
-local cli = FS.getIdentity()
-if not love.filesystem.isFused() then
-    cli = cli .. [[
-        <game> (string)         Game assets location
-    ]]
-end
-cli = cli..[[
-    --console               Output to a console window
-    --version               Print LOVE version
-    --fused                 Force running in fused mode
-    -d,--debug                 Debug with tomblind.local-lua-debugger-vscode
-    --profile               Profile code performance
-    --os (optional string)  Fake a certain OS for testing
-    <files...> (optional string)   One or more LOVE programs to run
-]]
-
-local function drawLoadError(i, err)
-    local mrg = 10
-    local w = GX.getWidth()
-    local font = GX.getFont()
-    local fh = font:getHeight()
-    local x, y = mrg, fh*i
-    w = w - 2*mrg
-    GX.printf(err, x, y, w, "left")
-end
+local LW = lovewich.new()
 
 ---@diagnostic disable-next-line: duplicate-set-field
-function love.run()
+function love.load()
+    local cli = FS.getIdentity()
+    if not love.filesystem.isFused() then
+        cli = cli .. [[
+            <game> (string)         Game assets location
+        ]]
+    end
+    cli = cli..[[
+        --console               Output to a console window
+        --version               Print LOVE version
+        --fused                 Force running in fused mode
+        -d,--debug              Debug with tomblind.local-lua-debugger-vscode
+        --profile               Profile code performance
+        --os (optional string)  Fake a certain OS for testing
+        <files...> (optional string)   One or more LOVE programs to run
+    ]]
+
     local args = require "pl.lapp"(cli)
 
 	if args.debug then
@@ -54,9 +44,17 @@ function love.run()
         profile.start("Fli1", filename)
     end
 
-    local LW = lovewich.new()
+    local GX = love.graphics
 
-    GX.setNewFont(16)
+    local function drawLoadError(i, err)
+        local mrg = 10
+        local w = GX.getWidth()
+        local font = GX.getFont()
+        local fh = font:getHeight()
+        local x, y = mrg, fh*i
+        w = w - 2*mrg
+        GX.printf(err, x, y, w, "left")
+    end
 
     local files = args.files
     local function loadf(i, file)
@@ -83,40 +81,19 @@ function love.run()
         }
     end
 
-	-- We don't want the first frame's dt to include
-    -- time taken by love.load.
-	if love.timer then love.timer.step() end
+    GX.setNewFont(16)
+end
 
-	local dt = 0
-    local fixedtimestep = fixed_timestep(60)
+local T = 0
+local FPS = 60
 
-	return function()
-		if love.event then
-			love.event.pump()
-			for name, a,b,c,d,e,f in love.event.poll() do
-				if name == "quit" then
-					if not love.quit or not love.quit() then
-						return a or 0
-					end
-				end
-				LW:inevent(name,a,b,c,d,e,f)
-			end
-		end
+---@diagnostic disable-next-line: duplicate-set-field
+function love.update(dt)
+    fixedupdate(FPS, T, dt, LW.outevent, LW, "fixedupdate")
+    LW:outevent("update", dt)
+end
 
-		if love.timer then dt = love.timer.step() end
-
-        local t = fixedtimestep(dt, LW.outevent, LW, "fixedupdate")
-        LW:outevent("animate", dt)
-
-		if love.graphics and love.graphics.isActive() then
-			love.graphics.origin()
-			love.graphics.clear(love.graphics.getBackgroundColor())
-
-            LW:outevent("draw", t)
-
-			love.graphics.present()
-		end
-
-		if love.timer then love.timer.sleep(0.001) end
-	end
+---@diagnostic disable-next-line: duplicate-set-field
+function love.draw()
+    LW:outevent("draw", T)
 end
