@@ -1,7 +1,7 @@
 local type = type
 local pcall = pcall
 local require = require
-local getmetatable = getmetatable
+local select = select
 local cocreate = coroutine.create
 local coresume = coroutine.resume
 local costatus = coroutine.status
@@ -34,6 +34,13 @@ function lovewich:pushfile(file, ...)
     return self:loadandpushfile(file, ...)
 end
 
+function lovewich:pushfiles(...)
+    for i = 1, select("#", ...) do
+        local f = select(i, ...)
+        self:pushfile(f)
+    end
+end
+
 function lovewich:loadandpushfile(file, ...)
     local f, err = loadfile(file)
     if not f then return nil, err end
@@ -57,6 +64,13 @@ function lovewich:pushmodule(module, ...)
     end
     self[#self+1] = ft
     return ft
+end
+
+function lovewich:pushmodules(...)
+    for i = 1, select("#", ...) do
+        local m = select(i, ...)
+        self:pushmodule(m)
+    end
 end
 
 ---@param ft lovewich.ftable
