@@ -105,6 +105,14 @@ local function event(self, i1, i2, di, ev, a, b, c, d, e, f)
     return a, b, c, d, e, f
 end
 
+function lovewich:evout(e, ...)
+    event(self, 1, #self, 1, e, ...)
+end
+
+function lovewich:evin(e, ...)
+    event(self, #self, 1, -1, e, ...)
+end
+
 local suspended = {} ---@type lovewich.ftable[]
 
 ---@param ft lovewich.ftable
@@ -162,14 +170,6 @@ end
 
 function lovewich:coevin(e, ...)
     coevent(self, #self, 1, -1, e, ...)
-end
-
-function lovewich:evout(e, ...)
-    event(self, 1, #self, 1, e, ...)
-end
-
-function lovewich:evin(e, ...)
-    event(self, #self, 1, -1, e, ...)
 end
 
 function lovewich:empty()
