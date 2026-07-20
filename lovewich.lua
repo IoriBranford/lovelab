@@ -156,19 +156,19 @@ local function coevent(self, i1, i2, di,
     return a, b, c, d, e, f
 end
 
-function lovewich:cooutevent(e, ...)
+function lovewich:coevout(e, ...)
     coevent(self, 1, #self, 1, e, ...)
 end
 
-function lovewich:coinevent(e, ...)
+function lovewich:coevin(e, ...)
     coevent(self, #self, 1, -1, e, ...)
 end
 
-function lovewich:outevent(e, ...)
+function lovewich:evout(e, ...)
     event(self, 1, #self, 1, e, ...)
 end
 
-function lovewich:inevent(e, ...)
+function lovewich:evin(e, ...)
     event(self, #self, 1, -1, e, ...)
 end
 

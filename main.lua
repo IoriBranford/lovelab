@@ -89,11 +89,11 @@ local FPS = 60
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function love.update(dt)
-    fixedupdate(FPS, T, dt, LW.outevent, LW, "fixedupdate")
-    LW:outevent("update", dt)
+    fixedupdate(FPS, T, dt, LW.evout, LW, "fixedupdate")
+    LW:evout("update", dt)
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function love.draw()
-    LW:outevent("draw", T)
+    LW:evout("draw", T)
 end
