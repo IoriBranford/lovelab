@@ -147,7 +147,7 @@ local function coevent(self, i1, i2, di,
         local ft = suspended[i]
         local co = assert(ft.eventco)
         ft.eventco = nil
-        local ok, err = coresume(co)
+        local ok, err = coresume(co, a, b, c, d, e, f)
         if not ok then
             ft[ev.."error"] = err
         end
