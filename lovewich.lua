@@ -34,19 +34,6 @@ function lovewich:pushfile(file, ...)
     return self:loadandpushfile(file, ...)
 end
 
-local function isCallable(o)
-    local ot = type(o)
-
-    if ot == "function" then return true end
-    if ot == "table" then
-        local mt = getmetatable(o)
-        if mt and type(mt.__call) == "function" then
-            return true
-        end
-    end
-    return false
-end
-
 function lovewich:loadandpushfile(file, ...)
     local f, err = loadfile(file)
     if not f then return nil, err end
@@ -62,12 +49,11 @@ end
 function lovewich:pushmodule(module, ...)
     local ok, m = pcall(require, module)
     if not ok then return ok, m end
-    if not isCallable(m) then
-        return nil, module.." must return a function table generator"
-    end
-    local ft = m(...)
-    if type(ft) ~= "table" then
-        return nil, module.." must return a function table"
+    local tm = type(m)
+    local ft = tm == "table" and m
+        or tm == "function" and m(...)
+    if not ft then
+        return nil, module.." must return a function or table"
     end
     self[#self+1] = ft
     return ft
