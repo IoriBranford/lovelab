@@ -7,10 +7,11 @@ local coresume = coroutine.resume
 local costatus = coroutine.status
 local loadfile = love and love.filesystem.load or loadfile
 
+---@alias eventerror string in the form eventname.."error"
+
 ---@class lovewich.ftable
----@field [string] function
+---@field [string] function|eventerror
 ---@field eventco thread?
----@field eventerror string?
 
 ---@class lovewich
 ---@field [integer] lovewich.ftable
