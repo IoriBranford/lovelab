@@ -92,6 +92,24 @@ local function event(self, i1, i2, di, ev, a, b, c, d, e, f)
         local ft = self[i]
         local fn = ft[ev]
         if type(fn) == "function" then
+            fn(a, b, c, d, e, f)
+        end
+    end
+end
+
+function lovewich:up(e, ...)
+    event(self, 1, #self, 1, e, ...)
+end
+
+function lovewich:down(e, ...)
+    event(self, #self, 1, -1, e, ...)
+end
+
+local function eventmut(self, i1, i2, di, ev, a, b, c, d, e, f)
+    for i = i1, i2, di do
+        local ft = self[i]
+        local fn = ft[ev]
+        if type(fn) == "function" then
             local u, v, w, x, y, z
                 = fn(a, b, c, d, e, f)
             if u ~= nil then a = u end
@@ -105,12 +123,12 @@ local function event(self, i1, i2, di, ev, a, b, c, d, e, f)
     return a, b, c, d, e, f
 end
 
-function lovewich:evout(e, ...)
-    event(self, 1, #self, 1, e, ...)
+function lovewich:upmut(e, ...)
+    return eventmut(self, 1, #self, 1, e, ...)
 end
 
-function lovewich:evin(e, ...)
-    event(self, #self, 1, -1, e, ...)
+function lovewich:downmut(e, ...)
+    return eventmut(self, #self, 1, -1, e, ...)
 end
 
 local suspended = {} ---@type lovewich.ftable[]
@@ -118,7 +136,55 @@ local suspended = {} ---@type lovewich.ftable[]
 ---@param ft lovewich.ftable
 ---@param ev string
 ---@param co thread
-local function coeventi(ft, ev, co,
+local function eventcbi(ft, ev, co,
+                            a, b, c, d, e, f)
+    local ok, err =
+        coresume(co, a, b, c, d, e, f)
+    if not ok then
+        ft[ev.."error"] = err
+        return
+    end
+    if costatus(co) ~= "dead" then
+        ft.eventco = co
+        suspended[#suspended+1] = ft
+    end
+end
+
+---@param self lovewich
+local function eventcb(self, i1, i2, di,
+                        ev, a, b, c, d, e, f)
+    for i = i1, i2, di do
+        local ft = self[i]
+        local fn = ft[ev]
+        if type(fn) == "function" then
+            local co = cocreate(fn)
+            eventcbi(ft, ev, co,
+                a, b, c, d, e, f)
+        end
+    end
+    for i = #suspended, 1, -1 do
+        local ft = suspended[i]
+        local co = assert(ft.eventco)
+        ft.eventco = nil
+        local ok, err = coresume(co)
+        if not ok then
+            ft[ev.."error"] = err
+        end
+    end
+end
+
+function lovewich:upcb(e, ...)
+    eventcb(self, 1, #self, 1, e, ...)
+end
+
+function lovewich:downcb(e, ...)
+    eventcb(self, #self, 1, -1, e, ...)
+end
+
+---@param ft lovewich.ftable
+---@param ev string
+---@param co thread
+local function eventmutcbi(ft, ev, co,
                             a, b, c, d, e, f)
     local ok, u, v, w, x, y, z
         = coresume(co, a, b, c, d, e, f)
@@ -140,7 +206,7 @@ local function coeventi(ft, ev, co,
 end
 
 ---@param self lovewich
-local function coevent(self, i1, i2, di,
+local function eventmutcb(self, i1, i2, di,
                         ev, a, b, c, d, e, f)
     for i = i1, i2, di do
         local ft = self[i]
@@ -148,7 +214,7 @@ local function coevent(self, i1, i2, di,
         if type(fn) == "function" then
             local co = cocreate(fn)
             a, b, c, d, e, f =
-                coeventi(ft, ev, co,
+                eventmutcbi(ft, ev, co,
                     a, b, c, d, e, f)
         end
     end
@@ -164,16 +230,12 @@ local function coevent(self, i1, i2, di,
     return a, b, c, d, e, f
 end
 
-function lovewich:coevout(e, ...)
-    coevent(self, 1, #self, 1, e, ...)
+function lovewich:upmutcb(e, ...)
+    return eventmutcb(self, 1, #self, 1, e, ...)
 end
 
-function lovewich:coevin(e, ...)
-    coevent(self, #self, 1, -1, e, ...)
-end
-
-function lovewich:empty()
-    return #self <= 0
+function lovewich:downmutcb(e, ...)
+    return eventmutcb(self, #self, 1, -1, e, ...)
 end
 
 return lovewich
