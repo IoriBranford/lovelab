@@ -11,7 +11,8 @@
             "program": {
                 "command": "love"
             },
-            "args": [ "${workspaceFolder}" ]
+            "scriptRoots": ["."],
+            "args": [ "." ]
         }
     ]
 }
