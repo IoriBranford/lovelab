@@ -11,7 +11,17 @@
             "program": {
                 "command": "love"
             },
-            "args": [ "${workspaceFolder}" ]
+            "args": [ "." ]
+        },
+        {
+            "name": "Debug",
+            "type": "lua-local",
+            "request": "launch",
+            "program": {
+                "command": "love"
+            },
+            "scriptRoots": [ "." ],
+            "args": [ ".", "--debug" ]
         }
     ]
 }

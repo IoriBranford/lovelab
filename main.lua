@@ -1,6 +1,8 @@
----@diagnostic disable-next-line: duplicate-set-field
-function love.load()
+require "love.debug"
 
+---@diagnostic disable-next-line: duplicate-set-field
+function love.load(args)
+    love.debug.load(args)
 end
 -- This function is called exactly once at the beginning of the game.
 

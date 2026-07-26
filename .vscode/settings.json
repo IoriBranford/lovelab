@@ -1,7 +1,8 @@
 {
     "Lua.addonManager.enable": true,
     "Lua.workspace.library": [
-        "${addons}/love2d/module/library"
+        "${addons}/love2d/module/library",
+        "${addons}/lldebugger/module/library"
     ],
     "Lua.runtime.version": "LuaJIT",
     "Lua.runtime.special": {
