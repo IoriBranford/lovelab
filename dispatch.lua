@@ -4,7 +4,7 @@ local tnew = require "table.new"
 
 ---@class listeners
 ---@field [integer] listener|false
----@field free table<integer, true>?
+---@field free integer[]?
 
 ---@class dispatch
 ---@field [string] listeners
@@ -29,9 +29,9 @@ function dispatch:sub(ev, l, after)
 
     local free = ls.free
     local i = not after and
-        free and next(free)
+        free and free[#free]
         or (#ls+1)
-    if free then free[i] = nil end
+    if free then free[#free] = nil end
 
     ls[i] = l
     return i
@@ -47,9 +47,9 @@ function dispatch:unsub(ev, i, l)
 
     if l then assert(l == ls[i]) end
 
-    local free = ls.free or tnew(0, 16)
+    local free = ls.free or tnew(8, 0)
     ls.free = free
-    free[i] = true
+    free[#free+1] = i
     ls[i] = false
 end
 
