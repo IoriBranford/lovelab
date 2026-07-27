@@ -59,7 +59,15 @@ end
 
 local function send(ls, i1, i2, di, ev, ...)
     for i = i1, i2, di do
-        if ls[i] then ls[i][ev](...) end
+        local l = ls[i]
+        if l then l[ev](...) end
+    end
+end
+
+local function sendself(ls, i1, i2, di, ev, ...)
+    for i = i1, i2, di do
+        local l = ls[i]
+        if l then l[ev](l, ...) end
     end
 end
 
@@ -71,6 +79,16 @@ end
 function dispatch:rsend(ev, ...)
     local ls = self[ev]
     if ls then send(ls, #ls, 1, -1, ev, ...) end
+end
+
+function dispatch:sendself(ev, ...)
+    local ls = self[ev]
+    if ls then sendself(ls, 1, #ls, 1, ev, ...) end
+end
+
+function dispatch:rsendself(ev, ...)
+    local ls = self[ev]
+    if ls then sendself(ls, #ls, 1, -1, ev, ...) end
 end
 
 return dispatch
