@@ -21,7 +21,7 @@ function love.event.disconnect(ev, conn, l)
     Conns:unsub(ev, conn, l)
 end
 
-function love.event.disconnectAll()
+function love.event.clearConnections()
     Conns = dispatch.new()
 end
 
