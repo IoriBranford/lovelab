@@ -36,3 +36,7 @@ function love.event.update()
         Conns:send(name, a, b, c, d, e, f)
     end
 end
+
+function love.event.pushNow(ev, ...)
+    Conns:send(ev, ...)
+end
