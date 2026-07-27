@@ -9,6 +9,7 @@ local tnew = require "table.new"
 ---@class dispatch
 ---@field [string] listeners
 local dispatch = {}
+dispatch.__index = dispatch
 
 function dispatch.new()
     local self = tnew(0, 16) ---@type dispatch
