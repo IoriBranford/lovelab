@@ -1,6 +1,6 @@
 local tnew = require "table.new"
 
----@alias listener table<string, function>
+---@alias listener table
 
 ---@class listeners
 ---@field [integer] listener|false
