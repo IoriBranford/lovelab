@@ -47,6 +47,23 @@ function dispatch:sub(ev, l, after)
     return i
 end
 
+function dispatch:allsub(l, after, force)
+    local sub = self.sub
+    if force then
+        for ev, f in pairs(l) do
+            if type(f) == "function" then
+                l[ev.."sub"] = sub(self, ev, l, after)
+            end
+        end
+    else
+        for ev, f in pairs(l) do
+            if self[ev] and type(f) == "function" then
+                l[ev.."sub"] = sub(self, ev, l, after)
+            end
+        end
+    end
+end
+
 ---Unsubscribe
 ---@param ev string
 ---@param i integer
@@ -61,6 +78,17 @@ function dispatch:unsub(ev, i, l)
     ls.free = free
     free[#free+1] = i
     ls[i] = false
+end
+
+function dispatch:allunsub(l)
+    local unsub = self.unsub
+    for ev in pairs(l) do
+        local i = l[ev.."sub"]
+        if i then
+            unsub(self, ev, i, l)
+            l[ev.."sub"] = nil
+        end
+    end
 end
 
 function dispatch:clearev(ev)
