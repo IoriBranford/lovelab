@@ -15,16 +15,20 @@ function dispatch.new(...)
     local self = tnew(0, 1) ---@type dispatch
     self.events = tnew(0, 16)
     setmetatable(self, dispatch)
-    for i = 1, select("#", ...) do
-        local ev = select(i, ...)
-        self:newevent(ev)
-    end
+    self:newevents(...)
     return self
 end
 
 function dispatch:newevent(ev)
     if not self.events[ev] then
         self.events[ev] = tnew(8, 1)
+    end
+end
+
+function dispatch:newevents(...)
+    for i = 1, select("#", ...) do
+        local ev = select(i, ...)
+        self:newevent(ev)
     end
 end
 
