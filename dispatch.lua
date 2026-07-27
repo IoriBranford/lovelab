@@ -11,10 +11,20 @@ local tnew = require "table.new"
 local dispatch = {}
 dispatch.__index = dispatch
 
-function dispatch.new()
+function dispatch.new(...)
     local self = tnew(0, 16) ---@type dispatch
     setmetatable(self, dispatch)
+    for i = 1, select("#", ...) do
+        local ev = select(i, ...)
+        self:newevent(ev)
+    end
     return self
+end
+
+function dispatch:newevent(ev)
+    if not self[ev] then
+        self[ev] = tnew(8, 1)
+    end
 end
 
 ---Subscribe
@@ -24,8 +34,8 @@ end
 function dispatch:sub(ev, l, after)
     assert(type(l[ev]) == "function")
 
-    local ls = self[ev] or tnew(16, 1)
-    self[ev] = ls
+    self:newevent(ev)
+    local ls = self[ev]
 
     local free = ls.free
     local i = not after and
