@@ -62,6 +62,6 @@ function love.event.update()
     end
 end
 
-function love.event.pushNow(ev, ...)
+function love.event.send(ev, ...)
     Conns:send(ev, ...)
 end

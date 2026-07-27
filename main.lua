@@ -51,13 +51,13 @@ function love.run()
 		if love.timer then dt = love.timer.step() end
 
 		-- Call update and draw
-		love.event.pushNow("update", dt) -- will pass 0 if love.timer is disabled
+		love.event.send("update", dt) -- will pass 0 if love.timer is disabled
 
 		if love.graphics and love.graphics.isActive() then
 			love.graphics.origin()
 			love.graphics.clear(love.graphics.getBackgroundColor())
 
-			love.event.pushNow("draw")
+			love.event.send("draw")
 
 			love.graphics.present()
 		end
