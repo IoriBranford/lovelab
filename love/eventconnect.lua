@@ -13,6 +13,31 @@ function love.event.connect(ev, l, after)
     return Conns:sub(ev, l, after)
 end
 
+---Connect specified events
+---@param l listener
+---@param after boolean
+---@param ... string
+function love.event.connectMult(l, after, ...)
+    local connect = love.event.connect
+    local n = select("#", ...)
+    for i = 1, n do
+        local ev = select(i, ...)
+        l[ev.."conn"] = connect(ev, l, after)
+    end
+end
+
+---Connect all of a table's functions to events
+---@param l listener
+---@param after boolean?
+function love.event.connectAll(l, after)
+    local connect = love.event.connect
+    for ev, f in pairs(l) do
+        if type(f) == "function" then
+            l[ev.."conn"] = connect(ev, l, after)
+        end
+    end
+end
+
 ---Disconnect from event
 ---@param ev string
 ---@param conn conn
