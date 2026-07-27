@@ -1,3 +1,4 @@
+local dispatch = require "dispatch"
 local FS = love.filesystem
 
 FS.setRequirePath(table.concat({
@@ -8,13 +9,8 @@ FS.setRequirePath(table.concat({
     "libraries/?/init.lua",
 }, ';'))
 
-local lovewich = require "lovewich"
-local fixedupdate = require "fixedupdate"
-
-local LW = lovewich.new()
-
 ---@diagnostic disable-next-line: duplicate-set-field
-function love.load()
+function love.run()
     local cli = FS.getIdentity()
     if not love.filesystem.isFused() then
         cli = cli .. [[
@@ -33,9 +29,9 @@ function love.load()
 
     local args = require "pl.lapp"(cli)
 
-	if args.debug then
-		require("lldebugger").start()
-	end
+    if args.debug then
+        require("lldebugger").start()
+    end
 
     if args.profile then
         jit.off()
@@ -56,16 +52,23 @@ function love.load()
         GX.printf(err, x, y, w, "left")
     end
 
+    local dsph = dispatch.new(
+        "load",
+        "update",
+        "draw",
+        "quit"
+    )
+
     local files = args.files
     local function loadf(i, file)
-        local ft, err = LW:pushfile(file)
-        if ft then return end
+        -- local ft, err = LW:pushfile(file)
+        -- if ft then return end
 
-        err = string.format("%d. %s: %s", i, file, err)
-        print(err)
-        LW[#LW+1] = {
-            draw = function() drawLoadError(i, err) end
-        }
+        -- err = string.format("%d. %s: %s", i, file, err)
+        -- print(err)
+        -- LW[#LW+1] = {
+        --     draw = function() drawLoadError(i, err) end
+        -- }
     end
 
     local i1 = FS.isFused() and 1 or 2
@@ -73,27 +76,51 @@ function love.load()
         loadf(i, files[i])
     end
 
-    if #LW <= 0 then
-        LW[1] = {
+    if #dsph.events.draw <= 0 then
+        dsph:allsub({
             draw = function()
                 drawLoadError(1, "No code files")
             end
-        }
+        })
     end
 
     GX.setNewFont(16)
-end
 
-local T = 0
-local FPS = 60
+    -- We don't want the first frame's dt to include time taken by love.load.
+    if love.timer then love.timer.step() end
 
----@diagnostic disable-next-line: duplicate-set-field
-function love.update(dt)
-    fixedupdate(FPS, T, dt, LW.up, LW, "fixedupdate")
-    LW:up("update", dt)
-end
+    local dt = 0
 
----@diagnostic disable-next-line: duplicate-set-field
-function love.draw()
-    LW:up("draw", T)
+    -- Main loop time.
+    return function()
+        -- Process events.
+        if love.event then
+            love.event.pump()
+            for name, a,b,c,d,e,f in love.event.poll() do
+                if name == "quit" then
+                    if not love.quit or not love.quit() then
+                        return "quit", a or 0
+                    end
+                end
+                dsph:send(name, a, b, c, d, e, f)
+            end
+        end
+
+        -- Update dt, as we'll be passing it to update
+        if love.timer then dt = love.timer.step() end
+
+        -- Call update and draw
+        dsph:send("update", dt) -- will pass 0 if love.timer is disabled
+
+        if love.graphics and love.graphics.isActive() then
+            love.graphics.origin()
+            love.graphics.clear(love.graphics.getBackgroundColor())
+
+            dsph:send("draw")
+
+            love.graphics.present()
+        end
+
+        if love.timer then love.timer.sleep(0.001) end
+    end
 end
