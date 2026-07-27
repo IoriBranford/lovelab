@@ -76,6 +76,8 @@ function dispatch:unsub(ev, i, l)
 
     if l then assert(l == ls[i]) end
 
+    if i == #ls then ls[i] = nil return end
+
     local free = ls.free or tnew(8, 0)
     ls.free = free
     free[#free+1] = i
