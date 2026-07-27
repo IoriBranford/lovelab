@@ -1,4 +1,3 @@
-local dispatch = require "dispatch"
 local FS = love.filesystem
 local GX = love.graphics
 
@@ -91,55 +90,4 @@ love.draw = function()
     local ghh = GX.getHeight()/2
     local fhh = GX.getFont():getHeight()/2
     GX.printf("love.eventconnect", ghw, ghh, 2*ghh, "center", a, 1, 1, ghh, fhh)
-end
-
-local Dispatch = dispatch.new("audiodisconnected", "directorydropped", "displayrotated", "draw", "dropbegan",
-    "dropcompleted", "dropmoved", "exposed", "filedropped", "focus", "gamepadaxis", "gamepadpressed", "gamepadreleased",
-    "joystickadded", "joystickaxis", "joystickhat", "joystickpressed", "joystickreleased", "joystickremoved",
-    "joysticksensorupdated", "keypressed", "keyreleased", "load", "localechanged", "lowmemory", "mousefocus",
-    "mousemoved", "mousepressed", "mousereleased", "occluded", "quit", "resize", "sensorupdated", "textedited",
-    "textinput", "threaderror", "touchmoved", "touchpressed", "touchreleased", "update", "visible", "wheelmoved")
-
----@diagnostic disable-next-line: duplicate-set-field
-function love.run()
-    Dispatch:allsub(love)
-    Dispatch:send("load", love.arg.parseGameArguments(arg), arg)
-
-    -- We don't want the first frame's dt to include time taken by love.load.
-    if love.timer then love.timer.step() end
-
-    local dt = 0
-
-    -- Main loop time.
-    return function()
-        -- Process events.
-        if love.event then
-            love.event.pump()
-            for name, a, b, c, d, e, f in love.event.poll() do
-                if name == "quit" then
-                    if not love.quit or not love.quit() then
-                        return "quit", a or 0
-                    end
-                end
-                Dispatch:send(name, a, b, c, d, e, f)
-            end
-        end
-
-        -- Update dt, as we'll be passing it to update
-        if love.timer then dt = love.timer.step() end
-
-        -- Call update and draw
-        Dispatch:send("update", dt) -- will pass 0 if love.timer is disabled
-
-        if love.graphics and love.graphics.isActive() then
-            love.graphics.origin()
-            love.graphics.clear(love.graphics.getBackgroundColor())
-
-            Dispatch:send("draw")
-
-            love.graphics.present()
-        end
-
-        if love.timer then love.timer.sleep(0.001) end
-    end
 end
