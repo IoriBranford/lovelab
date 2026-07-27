@@ -7,6 +7,8 @@ local LoveEvents = {"audiodisconnected", "directorydropped", "displayrotated", "
     "mousemoved", "mousepressed", "mousereleased", "occluded", "quit", "resize", "sensorupdated", "textedited",
     "textinput", "threaderror", "touchmoved", "touchpressed", "touchreleased", "update", "visible", "wheelmoved"}
 
+local ExtraEvents = {"reload"}
+
 local Conns ---@type dispatch
 
 ---@alias conn integer
@@ -14,7 +16,9 @@ local Conns ---@type dispatch
 ---Reset the event engine
 function love.event.reset()
     Conns = dispatch.new(unpack(LoveEvents))
+    Conns:newevents(unpack(ExtraEvents))
     Conns:allsub(love)
+    Conns:send("reload")
 end
 
 ---Register a new event
@@ -78,7 +82,9 @@ end
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function love.run()
-    love.event.reset()
+    Conns = dispatch.new(unpack(LoveEvents))
+    Conns:newevents(unpack(ExtraEvents))
+    Conns:allsub(love)
     Conns:send("load", love.arg.parseGameArguments(arg), arg)
 
     -- We don't want the first frame's dt to include time taken by love.load.

@@ -9,6 +9,8 @@ FS.setRequirePath(table.concat({
     "libraries/?/init.lua",
 }, ';'))
 
+require "love.eventconnect"
+
 local function drawLoadError(i, err)
     local mrg = 10
     local w = GX.getWidth()
@@ -19,8 +21,10 @@ local function drawLoadError(i, err)
     GX.printf(err, x, y, w, "left")
 end
 
+local A = 0
+
 ---@diagnostic disable-next-line: duplicate-set-field
-function love.load()
+function love.load(args)
     local cli = FS.getIdentity()
     if not love.filesystem.isFused() then
         cli = cli .. [[
@@ -75,13 +79,22 @@ function love.load()
     --     })
     -- end
     GX.setNewFont(64)
+    love.reload()
 end
 
-local a = 0
+function love.reload()
+    A = 0
+end
+
+function love.keypressed(k)
+    if k == 'f2' then
+        love.event.reset()
+    end
+end
 
 ---@diagnostic disable-next-line: duplicate-set-field
 love.update = function (dt)
-    a = a + dt
+    A = A + dt
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -89,5 +102,5 @@ love.draw = function()
     local ghw = GX.getWidth()/2
     local ghh = GX.getHeight()/2
     local fhh = GX.getFont():getHeight()/2
-    GX.printf("love.eventconnect", ghw, ghh, 2*ghh, "center", a, 1, 1, ghh, fhh)
+    GX.printf("love.eventconnect", ghw, ghh, 2*ghh, "center", A, 1, 1, ghh, fhh)
 end
