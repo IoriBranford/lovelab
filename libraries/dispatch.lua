@@ -11,9 +11,9 @@ local tnew = require "table.new"
 local dispatch = {}
 
 function dispatch.new()
-    return setmetatable(
-        tnew(0, 16), ---@type dispatch
-        dispatch)
+    local self = tnew(0, 16) ---@type dispatch
+    setmetatable(self, dispatch)
+    return self
 end
 
 ---Subscribe
@@ -39,7 +39,7 @@ end
 ---Unsubscribe
 ---@param ev string
 ---@param i integer
----@param l listener
+---@param l listener?
 function dispatch:unsub(ev, i, l)
     local ls = self[ev]
     if not ls then return end
