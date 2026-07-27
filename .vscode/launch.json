@@ -26,17 +26,7 @@
             "program": {
                 "command": "love"
             },
-            "args": [ "${workspaceFolder}" ]
-        },
-        {
-            "name": "Debug map...",
-            "type": "lua-local",
-            "request": "launch",
-            "program": {
-                "command": "love"
-            },
-            "scriptRoots": ["${workspaceFolder}"],
-            "args": ["${workspaceFolder}", "--debug", "data/${input:map}.lua"]
+            "args": [ "." ]
         },
         {
             "name": "Debug",
@@ -45,8 +35,18 @@
             "program": {
                 "command": "love"
             },
-            "scriptRoots": ["${workspaceFolder}"],
-            "args": ["${workspaceFolder}", "--debug"]
+            "scriptRoots": [ "." ],
+            "args": [ ".", "--debug" ]
         },
+        {
+            "name": "Debug map...",
+            "type": "lua-local",
+            "request": "launch",
+            "program": {
+                "command": "love"
+            },
+            "scriptRoots": ["."],
+            "args": [".", "--debug", "data/${input:map}.lua"]
+        }
     ]
 }
