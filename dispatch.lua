@@ -137,4 +137,23 @@ function dispatch:rsendself(ev, ...)
     if ls then sendself(ls, #ls, 1, -1, ev, ...) end
 end
 
+function dispatch:sort(ev, cmp)
+    local ls = self.events[ev]
+    if not ls then return end
+
+    table.sort(ls, function(a, b)
+        return a and not b
+            or a and b and cmp(a, b)
+    end)
+
+    while not ls[#ls] do
+        ls[#ls] = nil
+    end
+    local sub = ev.."sub"
+    for i = 1, #ls do
+        ls[i][sub] = i
+    end
+    ls.free = nil
+end
+
 return dispatch
