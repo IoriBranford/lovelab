@@ -10,6 +10,7 @@ FS.setRequirePath(table.concat({
 }, ';'))
 
 require "love.eventconnect"
+local fixedupdate = require "fixedupdate"
 
 local function drawLoadError(i, err)
     local mrg = 10
@@ -20,8 +21,6 @@ local function drawLoadError(i, err)
     w = w - 2 * mrg
     GX.printf(err, x, y, w, "left")
 end
-
-local A = 0
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function love.load(args)
@@ -82,8 +81,47 @@ function love.load(args)
     love.reload()
 end
 
+local A = 0
+local T = 0
+
+local Player = {
+    x = 0, y = 0,
+    vx = 0,
+    vy = 0,
+    gamepadaxisself = function(self, gp, ax, val)
+        if ax == "leftx" then
+            self.vx = val*8
+        elseif ax == "lefty" then
+            self.vy = val*8
+        end
+    end,
+    updateself = function(self)
+        local x = self.x + self.vx
+        local y = self.y + self.vy
+        local gw, gh = GX.getDimensions()
+        self.x = math.max(0, math.min(x, gw))
+        self.y = math.max(0, math.min(y, gh))
+    end,
+    drawself = function(self, t)
+        local x = self.x + self.vx*t
+        local y = self.y + self.vy*t
+        GX.circle("fill", x, y, 30)
+    end
+}
+
 function love.reload()
     A = 0
+    love.event.newEvents("fixedupdate", "fixeddraw", "gamepadaxisself", "updateself", "drawself")
+
+    local gw, gh = GX.getDimensions()
+
+    Player.x = gw / 2
+    Player.y = gh / 2
+    love.event.connectAll(Player)
+end
+
+function love.gamepadaxis(...)
+    love.event.sendSelves("gamepadaxisself", ...)
 end
 
 function love.keypressed(k)
@@ -93,14 +131,19 @@ function love.keypressed(k)
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
-love.update = function (dt)
-    A = A + dt
+love.update = function(dt)
+    local _
+    _, T = fixedupdate(60, T, dt, function ()
+        love.event.send("fixedupdate")
+        love.event.sendSelves("updateself")
+    end)
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
 love.draw = function()
-    local ghw = GX.getWidth()/2
-    local ghh = GX.getHeight()/2
-    local fhh = GX.getFont():getHeight()/2
-    GX.printf("love.eventconnect", ghw, ghh, 2*ghh, "center", A, 1, 1, ghh, fhh)
+    local ghw = GX.getWidth() / 2
+    local ghh = GX.getHeight() / 2
+    local fhh = GX.getFont():getHeight() / 2
+    GX.printf("love.eventconnect", ghw, ghh, 2 * ghh, "center", A, 1, 1, ghh, fhh)
+    love.event.sendSelves("drawself", T)
 end
