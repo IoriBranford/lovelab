@@ -29,10 +29,7 @@ end
 ---Register multiple new events
 ---@param ... string
 function love.event.newEvents(...)
-    for i = 1, select("#", ...) do
-        local ev = select(i, ...)
-        Conns:newevent(ev)
-    end
+    Conns:newevents(...)
 end
 
 ---Connect to event
