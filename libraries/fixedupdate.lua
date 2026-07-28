@@ -6,7 +6,7 @@ local function fixedupdate(fps, t, dt, f, ...)
     for _ = 1, n do
         f(...)
     end
-    return n, t
+    return t, n
 end
 
 return fixedupdate

@@ -132,8 +132,7 @@ end
 
 ---@diagnostic disable-next-line: duplicate-set-field
 love.update = function(dt)
-    local _
-    _, T = fixedupdate(60, T, dt, function ()
+    T = fixedupdate(60, T, dt, function ()
         love.event.send("fixedupdate")
         love.event.sendSelves("updateself")
     end)
